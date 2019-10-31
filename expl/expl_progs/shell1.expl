@@ -1,0 +1,24 @@
+int main()
+{ 
+  decl 
+  str s;
+  int p;
+   int temp;
+  enddecl
+
+  begin
+
+  temp=exposcall("Read",-1,s);
+
+         if(s!="Shutdown") then
+      temp=exposcall("Delete",s);
+      
+        else
+       temp=exposcall("Shutdown");
+     endif;
+
+   return 0;
+  end
+} 
+
+  

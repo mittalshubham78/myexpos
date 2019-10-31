@@ -1,0 +1,33 @@
+int main()
+{
+ 	decl 
+   		int temp,ret,pid;
+		str file;
+	enddecl
+   	begin
+		     while(1==1) do
+			write("TypeCommand$");
+   			temp=exposcall("Read",-1,file);
+                         
+   		  	if(file != "Shutdown")  then
+			
+				pid = exposcall("Fork");
+			
+				if(pid == 0) then
+					ret=exposcall("Exec",file);
+                               
+                                       
+					if(ret == -1) then
+						write("Bad Command");
+						break;
+					endif;
+				else
+					ret = exposcall("Wait",pid);
+				endif;
+			else
+				ret = exposcall("Shutdown");
+	    		endif;
+		endwhile;
+   	return 0;
+  	end
+}

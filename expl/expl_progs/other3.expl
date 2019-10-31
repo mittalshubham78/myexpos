@@ -1,0 +1,64 @@
+type
+list
+ {
+    int data;
+    list next;
+}
+endtype
+
+
+int main()
+{
+  decl
+  list head,p,q;
+  int i,x,pid,length,temp;
+  enddecl
+
+  begin
+  temp=exposcall("Heapset");
+  head=null;
+  q=head;
+   length=1;
+
+    while(length<=100) do
+     p=exposcall("Alloc",2);
+    p.data=length;
+    p.next=null;
+
+   if(head==null) then
+      head=p;
+        q=p;
+
+    else
+  q.next=p;
+   q=q.next;
+  endif;
+ 
+ length=length+1;
+ endwhile;
+
+  pid=exposcall("Fork");
+  if(pid==0) then
+    p=head;
+   while(p!=null) do
+    write(p.data);
+  p=p.next;
+    if(p==null) then
+     break;
+    endif;
+ p=p.next;
+  endwhile;
+ else
+  q=head.next;
+   while(q!=null) do
+      write(q.data);
+    q=q.next;
+    if(q==null) then
+   break;
+  endif;
+  q=q.next;
+  endwhile;
+ endif;
+return 0;
+end
+}

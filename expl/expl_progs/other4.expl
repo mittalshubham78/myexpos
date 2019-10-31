@@ -1,0 +1,20 @@
+int main()
+{
+  decl
+  int temp;
+  str file;
+  enddecl
+
+  begin
+     
+   temp=exposcall("Fork");
+   temp=exposcall("Fork");
+   temp=exposcall("Fork");
+    
+     if(temp!=-1) then
+   temp=exposcall("Getpid");
+     write(temp);
+  endif;
+  return 0;
+  end
+}

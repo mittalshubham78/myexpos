@@ -1,0 +1,110 @@
+alias sys_call R5;
+
+alias userSP R0;
+ userSP=SP;
+
+sys_call = [[PTBR + ((userSP-5)/512)*2]*512 + (userSP-5)%512];
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 13]=SP;
+
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +11]*512 -1;
+
+if(sys_call == 19) then
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=sys_call;
+
+alias des R3;
+alias userarea R6;
+
+ userarea=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +11];
+ 
+des = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+
+  //to check for valid descriptor
+
+   if((des < 0) || (des > 7) || ([userarea *512 + 496 + 2*des]!=1)) then
+       [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+  [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]=-1;
+     SP=userSP;
+    ireturn;
+  endif;
+
+ alias semid R7;
+   semid=[userarea*512 + 496 + (2*des) +1];       
+
+    while([SEMAPHORE_TABLE + (semid*4)]!=-1) do
+   [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +4]=WAIT_SEMAPHORE;
+   [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +5]=semid;
+  
+    backup;
+  call MOD_5;
+   restore;
+  endwhile;
+
+   //locking of semaphore by process
+
+   [SEMAPHORE_TABLE + (semid * 4)]=[SYSTEM_STATUS_TABLE +1];
+
+ [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)% 512]=0;
+
+    [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+   SP=userSP;
+ ireturn;
+endif;
+
+if(sys_call == 20) then
+
+  [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=sys_call;
+
+ alias des R3;
+ alias userarea R6;
+
+    des=[[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)% 512];
+   userarea=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +11];
+ 
+
+    //checking for valid descriptor
+
+    if((des < 0) || (des > 7) || ([userarea *512 + 496 + (2*des)]!=1)) then
+     [PROCESS_TABLE  + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=0;
+      [[PTBR + ((userSP -1)/512)*2]*512 + (userSP -1)%512]=-1;
+     SP=userSP;
+    ireturn;
+   endif;
+
+  alias semid R7;
+   semid=[userarea*512 + 496 + (2*des) +1];
+
+
+
+     //if semaphore is locked by some other process
+ 
+   if([SEMAPHORE_TABLE + (4*semid)]!=-1) then
+         if([SEMAPHORE_TABLE + (4*semid)]!=[SYSTEM_STATUS_TABLE +1]) then
+         [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]=-2;
+           [PROCESS_TABLE  + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+          SP=userSP;
+     ireturn;
+        endif;
+
+    [SEMAPHORE_TABLE + (4*semid)]=-1;     
+  alias i R12;
+   i=0;
+
+   //wake up all the process who are waiting for semaphore
+ 
+  while(i < 16) do
+if(([PROCESS_TABLE + (i*16) +4]==WAIT_SEMAPHORE) && ([PROCESS_TABLE + (i*16) +5]==semid)) then
+   [PROCESS_TABLE + (i*16) +4]=READY;
+   endif;
+
+  i=i+1;
+  endwhile;
+  endif;
+
+  [[PTBR + ((userSP -1)/512)*2]*512 + (userSP-1)%512]=0;
+   [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+
+   SP=userSP;
+  ireturn;
+  endif;

@@ -1,0 +1,38 @@
+decl
+ int fun(int a,int b);
+enddecl
+
+int fun(int a,int b)
+{
+   decl 
+   int e;
+   enddecl
+
+     begin
+   if(a==0) then
+    e=b;
+
+    else
+    e=fun(b % a,a);
+   endif;
+  return e;
+   end
+}
+    
+int main()
+{
+  decl
+    int a,b,c,temp;
+  str p;
+  enddecl
+
+    begin
+   p="Enter two numbers";
+   temp=exposcall("Write",-2,p);
+    read(a);
+    read(b);
+    c=fun(a,b);
+   write(c);
+    return 0;
+   end
+}

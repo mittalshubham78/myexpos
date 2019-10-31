@@ -1,0 +1,54 @@
+int main()
+{
+  decl 
+  int temp,filedes,a,b,permission,iter;
+   str file,word;
+  enddecl
+
+    begin 
+    temp=exposcall("Read",-1,file);
+     temp=exposcall("Create",file,1);
+
+     filedes = exposcall("Open",file);
+
+    
+        iter=1;
+
+         while(iter <=100) do
+        a=exposcall("Write",filedes,iter);
+           
+           iter=iter+1;
+         endwhile;
+
+       
+
+        iter=exposcall("Seek",filedes,2048);
+        iter=exposcall("Seek",filedes,-1);
+
+
+       
+
+     while(1==1) do
+      temp=exposcall("Read",filedes,word);
+    
+        
+          if(temp == -2) then
+             break;
+          endif;
+
+        temp=exposcall("Write",-2,word);
+        temp=exposcall("Seek",filedes,-2);
+          
+          
+          if(temp==-2) then
+            break;
+
+        endif;
+      endwhile;
+    temp=exposcall("Close",filedes);
+
+    return 0;
+  end
+}
+
+     

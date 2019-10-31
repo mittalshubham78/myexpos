@@ -1,0 +1,126 @@
+alias userSP R0;
+alias ret R6;
+alias userarea R9;
+ alias filedesvalue R5;
+userSP=SP;
+
+ [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=7; 
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 13]=SP;
+
+SP=[PROCESS_TABLE +([SYSTEM_STATUS_TABLE +1]*16) +11]*512 -1;
+
+userarea = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +11];
+
+ret = [PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512;
+
+ alias word R7;
+  word=[[PTBR + ((userSP-3)/512)*2]*512 + (userSP-3)%512];
+
+filedesvalue=[[PTBR+((userSP-4)/512)*2]*512 + (userSP-4)%512];
+ if(filedesvalue !=-1) then 
+
+	if(filedesvalue < 0 || filedesvalue > 7 ||[userarea*512 + 496 +2*filedesvalue]!=FILE) then
+
+	  [ret]=-1;
+	  SP=userSP;
+	  [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+	  ireturn;
+	  endif;
+	
+
+	  alias open_entry R8;
+	  alias inode_entry R4;
+	   open_entry = [userarea * 512 + 496 + (2*filedesvalue) +1];
+	    inode_entry = [OPEN_FILE_TABLE + (open_entry  * 4)];  
+	
+
+	   multipush(R0,R1,R2,R3,R4,R5,R6,R7,R8,R9);
+	  R1=4;
+	  R2=[SYSTEM_STATUS_TABLE +1];
+	  R3=inode_entry;
+	   call MOD_0;
+	   R10=R0;
+	  multipop(R0,R1,R2,R3,R4,R5,R6,R7,R8,R9);
+	
+  
+	     if(R10 == -1) then
+	    [ret]=-1;
+	  [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+	    SP=userSP;
+	   ireturn;
+	  endif;
+	
+	 alias lseek R12;
+	  lseek = [OPEN_FILE_TABLE + open_entry * 4 + 2];
+
+	    if(inode_entry == INODE_ROOT) then
+	      if(lseek == 480) then 
+	       backup;
+	         R1=5;
+	         R2=[SYSTEM_STATUS_TABLE +1];
+	        R3=inode_entry;
+	      call MOD_0;
+	     restore;
+	       [ret]=-2;
+	      [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0; 
+	       SP=userSP;
+	     ireturn;
+	     endif;
+   
+	  [[PTBR + 2*(word/512)]*512 + (word)%512]=[ROOT_FILE + lseek];
+	 [OPEN_FILE_TABLE + (4 * open_entry) +2]=[OPEN_FILE_TABLE + (4 * open_entry) +2]+1;
+ 
+	   else
+	   alias filesize R11;
+	   filesize = [INODE_TABLE + (inode_entry * 16) +2];
+	     
+	   if(lseek == filesize) then
+	    backup;
+	     R1=5;
+	     R2=[SYSTEM_STATUS_TABLE +1];
+	     R3=inode_entry;
+	      call MOD_0;
+	      restore;
+    
+	     [ret]=-2;
+	    [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+	      SP=userSP;
+	    ireturn;
+	   endif;
+	
+	    backup;
+	     R1=BUFFERED_READ;
+	     R2=[INODE_TABLE + 16*inode_entry + 8 + (lseek/512)];
+	     R3=lseek % 512;
+	     R4=[PTBR + 2*(word/512)]*512 + (word)%512;
+	     call MOD_3;
+	     restore;
+
+	 [OPEN_FILE_TABLE + open_entry*4 +2]=[OPEN_FILE_TABLE + open_entry*4 +2]+1;
+       	  endif;
+
+	     backup;
+	   R1=5;
+	   R2=[SYSTEM_STATUS_TABLE +1];
+	   R3=inode_entry;
+	    call MOD_0;
+	   restore;
+
+	 [ret]=0;
+	
+else
+ 
+	   backup;
+	   R1=4;
+	   R2=[SYSTEM_STATUS_TABLE +1];
+	  R3=word;
+	   call MOD_4;
+	    restore; 
+		print [[PTBR + 2 *((word) / 512)] * 512 + (word%512)];
+	    [ret]=0;
+endif;
+
+	  [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=0;
+	  SP=userSP;
+	  ireturn;

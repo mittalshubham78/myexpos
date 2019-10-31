@@ -1,0 +1,170 @@
+//breakpoint;
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=8;
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 13]=SP;
+
+SP=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 11]*512 -1;
+
+//breakpoint;
+
+R1=GET_PCB_ENTRY;
+call MOD_1;
+
+//breakpoint;
+
+if(R0==-1) then
+
+  SP=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +13];
+  [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1]*16) + 9]=0;
+  multipush(R0);
+ alias userSP R0;
+  userSP=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 13];
+ [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]=-1;
+  multipop(R0);
+ ireturn;
+endif;
+
+//breakpoint;
+
+alias pid_child R7;
+pid_child=R0;
+
+alias parent_pid R5;
+parent_pid = [SYSTEM_STATUS_TABLE +1];
+
+alias parent_table R9;
+parent_table = PAGE_TABLE_BASE + (parent_pid*20);
+
+alias child_table R8;
+child_table=PAGE_TABLE_BASE + (pid_child*20);
+
+alias child_process R6;
+child_process = PROCESS_TABLE + (pid_child * 16);
+
+alias parent_process R4;
+parent_process= PROCESS_TABLE + (parent_pid * 16);
+
+if([PTBR + 4]==-1) then
+  backup;
+ R1=GET_FREE_PAGE;
+  call MOD_2;
+//breakpoint;
+[parent_table + 4]=R0;
+[parent_table + 5]="0110";
+ restore;
+endif;
+
+if([PTBR + 6]==-1) then
+backup;
+ R1=GET_FREE_PAGE;
+ call MOD_2;
+//breakpoint;
+[parent_table + 6]=R0;
+[parent_table + 7]="0110";
+restore;
+endif;
+
+backup;
+R1=GET_FREE_PAGE;
+call MOD_2;
+//breakpoint;
+ [child_table + 16]=R0;
+ [child_table + 17]="0110";
+restore;
+
+backup;
+R1=GET_FREE_PAGE;
+call MOD_2;
+//breakpoint;
+ [child_table + 18]=R0;
+ [child_table + 19]="0110";
+restore;
+
+backup;
+R1=GET_FREE_PAGE;
+ call MOD_2;
+//breakpoint;
+ [child_process + 11]=R0;
+ restore;
+
+
+
+alias i R10;
+ i=0;
+
+while(i < 16) do
+ if((i==3)||(i==4)||(i==6)||(i==7)||(i==9)||(i==10)||(i==13)) then
+[child_process + i]=[parent_process + i]; 
+endif;
+i=i+1;
+endwhile;
+                                                                            
+
+[child_process]=0;
+[child_process +9]=0;
+[child_process +12]=0;
+[child_process +2]=parent_pid;
+[child_process +4]=CREATED;
+
+i=0;
+
+while(i < 10) do
+[DISK_MAP_TABLE + (pid_child*10) + i]=[DISK_MAP_TABLE + (parent_pid*10) +i];
+i=i+1;
+endwhile;
+
+i=0;
+
+while(i <= 15) do
+  [child_table + i]=[parent_table + i];
+  [child_table + i+1]=[parent_table + i+1];
+
+  if([parent_table + i]!=-1) then
+  [MEMORY_FREE_LIST + [parent_table +i]]=[MEMORY_FREE_LIST + [parent_table + i]]+1;
+   endif;
+  i=i+2;
+endwhile;
+
+alias j R11;
+ j=16;
+
+while(j<=19) do
+ if([parent_table + j]!=-1) then
+ i=0;
+while(i < 512) do
+ [[child_table + j]*512 + i]=[[parent_table + j]*512 + i];
+ i=i+1;
+endwhile;
+ endif;
+ j=j+2;
+endwhile;
+
+i=496;
+
+while(i <= 511) do
+ if([[parent_process +11]*512 + i]==SEMAPHORE) then
+  alias semid R12;
+  semid=[[parent_process+11]*512 + i+1];
+     [SEMAPHORE_TABLE + (4*semid) +1]=[SEMAPHORE_TABLE + (4*semid) +1]+1;
+    endif;
+
+  if([[parent_process +11]*512 + i]==FILE) then
+    alias file_index R12;
+   file_index = [[parent_process +11]*512 +i +1];
+  [OPEN_FILE_TABLE + file_index * 4 + 1]=[OPEN_FILE_TABLE + file_index *4 +1]+1;  endif;
+
+[[child_process +11]*512 +i]=[[parent_process +11]*512 +i];
+[[child_process +11]*512 + i+1]=[[parent_process +11]*512 +i+1];
+  i=i+2;
+ endwhile;    
+
+[[child_process + 11]*512]=BP;
+                   
+[[child_table + (([child_process +13] - 1)/512)*2]*512 + ([child_process +13]-1) % 512]=0;
+[[parent_table + (([parent_process + 13] -1)/512)*2]*512 + ([parent_process +13]-1) % 512]=pid_child;
+
+[parent_process + 9]=0;
+SP=[parent_process + 13];
+
+//breakpoint;
+ireturn;

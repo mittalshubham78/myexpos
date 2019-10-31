@@ -1,0 +1,92 @@
+alias functionnum R1;
+alias currentPID R2;
+
+if(functionnum ==3) then
+   
+backup;
+R1=8;
+R2=currentPID;
+
+call MOD_0;
+restore;
+
+print R3;
+backup;
+
+R1=9;
+R2=currentPID;
+call MOD_0;
+
+restore;
+return;
+endif;
+
+if(functionnum==4) then
+ backup;
+  R1=8;
+  R2=[SYSTEM_STATUS_TABLE +1];
+ call MOD_0;
+ restore;
+
+ read;
+ [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +4]=WAIT_TERMINAL;
+  backup;
+  call MOD_5;
+  restore;
+  alias physical_add R8;
+  physical_add=[PTBR + (R3/512)*2]*512 + (R3%512);
+ 
+  [physical_add]=[PROCESS_TABLE + (currentPID*16) + 8];
+
+
+return;
+endif;
+
+
+if(functionnum==2) then
+  alias page_num R3;
+  alias block_num R4;
+
+   backup;
+   R1=3;
+  R2=currentPID;
+    call MOD_0;
+  restore;
+
+   [DISK_STATUS_TABLE]=1;
+  [DISK_STATUS_TABLE+1]=0;
+   [DISK_STATUS_TABLE +2]=page_num;
+   [DISK_STATUS_TABLE+3]=block_num;
+   load(page_num,block_num);
+
+   [PROCESS_TABLE + (currentPID*16)+4]=WAIT_DISK;
+   backup;
+ 
+   call MOD_5;
+  restore;
+return;
+endif;
+
+if(functionnum ==1) then
+ 
+  alias page R3;
+ alias block R4;
+
+   backup;
+  R1=3;
+  R2=currentPID;
+   call MOD_0;
+  restore;
+
+   [DISK_STATUS_TABLE + 2]=page;
+  [DISK_STATUS_TABLE +3]=block;
+   store(page,block);
+
+    [PROCESS_TABLE + (currentPID *16) +4]=WAIT_DISK;
+  backup;
+  call MOD_5;
+   restore;
+
+  return;
+ endif;
+

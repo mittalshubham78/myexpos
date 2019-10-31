@@ -1,0 +1,18 @@
+load --os $HOME/Downloads/myexpos/spl/spl_progs/os_startup13.xsm
+load --library $HOME/Downloads/myexpos/expl/library.lib
+load --int=timer $HOME/Downloads/myexpos/spl/spl_progs/timer_14.xsm
+load --int=7 $HOME/Downloads/myexpos/spl/spl_progs/sample_int7.xsm
+load --int=10 $HOME/Downloads/myexpos/spl/spl_progs/exit.xsm
+load --exhandler $HOME/Downloads/myexpos/spl/spl_progs/exhandler.xsm
+load --module 7 $HOME/Downloads/myexpos/spl/spl_progs/MOD_7.xsm
+load --module 5 $HOME/Downloads/myexpos/spl/spl_progs/MOD_5.xsm
+load --module 0 $HOME/Downloads/myexpos/spl/spl_progs/MOD_0.xsm
+load --module 4 $HOME/Downloads/myexpos/spl/spl_progs/MOD_4.xsm
+load --module 1 $HOME/Downloads/myexpos/spl/spl_progs/MOD_1.xsm
+load --module 2 $HOME/Downloads/myexpos/spl/spl_progs/MOD_2.xsm
+load --int=6 $HOME/Downloads/myexpos/spl/spl_progs/INT_6.xsm
+load --int=9 $HOME/Downloads/myexpos/spl/spl_progs/INT_9.xsm
+load --int=8 $HOME/Downloads/myexpos/spl/spl_progs/fork.xsm
+load --init $HOME/Downloads/myexpos/expl/expl_progs/shell.xsm
+load --int=console $HOME/Downloads/myexpos/spl/spl_progs/coninthandler.xsm
+load --int=disk $HOME/Downloads/myexpos/spl/spl_progs/disk_inthand.xsm

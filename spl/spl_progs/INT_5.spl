@@ -1,0 +1,205 @@
+alias userSP R4;
+alias sys_call R5;
+alias ret_val R10;
+alias process R11;
+userSP = SP;
+
+process= PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16);
+ret_val=[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512;
+
+sys_call = [[PTBR + ((userSP-5)/512)*2]*512 + (userSP-5) % 512];
+ 
+[process  +13]=SP;
+ 
+SP=[process +11]*512 -1;
+
+alias userarea R7;
+userarea = [process +11];
+
+
+if(sys_call == 2) then
+
+	[process +9]=2;
+  
+ 	alias file_name R6;
+    	file_name = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+
+ 	alias i R8;
+ 	alias file_des R12;
+  	i=496;
+ 	file_des=-1;
+
+  	while(i < 512) do
+  	if([userarea * 512 + i]==-1) then
+   	file_des = (i-496)/2;
+      	break;
+   	endif;
+  	i=i+1;
+  	endwhile;
+
+
+if(file_des == -1) then
+	[process +9]=0;
+  	SP=userSP;
+	[ret_val]=-3;
+    	ireturn;
+   	endif;
+
+	multipush(R4,R5,R6,R7,R8,R10,R11,R12);
+ 	R1=3;
+  	R2=file_name;
+ 	call MOD_3;
+  	multipop(R4,R5,R6,R7,R8,R10,R11,R12);
+
+  	alias file_index R9;
+   	file_index = R0;
+
+if(file_index == -1) then
+   	 [ret_val]=-1;
+   	 SP=userSP;
+  	 [process + 9]=0;
+ 	 ireturn;
+	 endif;
+
+if(file_index == -2) then
+   	 [ret_val]=-2;
+  	 SP=userSP;
+   	 [process + 9]=0;
+ 	 ireturn;
+ 	 endif;
+
+
+	 [userarea * 512 + 496 +  2*file_des]=FILE;
+ 	 [userarea * 512 + 496 +  2*file_des+1]=file_index;
+
+   	 [process + 9]=0;
+    	 SP=userSP;
+
+  	 [ret_val]=file_des;
+ 	 ireturn;
+	 endif;
+
+if(sys_call == 3) then
+	[process + 9]=3;
+ 
+	alias file_des R12;
+  	file_des =[[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+
+if((file_des < 0) || (file_des > 7)) then
+   	[ret_val]=-1;
+  	[process + 9]=0;
+    	SP=userSP;
+   	ireturn;
+  	endif;
+  
+
+if([userarea * 512 +496 +2*file_des]!=FILE) then
+ 	[ret_val]=-1;
+ 	[process + 9]=0;
+  	SP=userSP;
+  	ireturn;
+ 	endif;
+  
+   
+	alias file_index R9;
+  	file_index = [userarea * 512 + 496 + 2*file_des + 1];
+ 
+	backup;
+  	R1=4;
+ 	R2=file_index;
+  	call MOD_3;
+ 	restore;
+
+ 	[userarea* 512 + 496 + 2*file_des]=-1;
+
+ 	[process + 9]=0;
+  	SP=userSP;
+  	[ret_val]=0;
+  	ireturn;
+ 	endif;
+
+if(sys_call ==6) then
+ 	[process +9]=6;
+
+  	alias file_des R6;
+  	file_des = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+
+	if(file_des < 0 || file_des > 7 || [userarea*512 +496 + 2*file_des]!=FILE) then
+  	[ret_val]=-1;
+ 	SP=userSP;
+ 	[process +9]=0;
+	ireturn;
+	endif;
+
+ 	alias open_index R9;
+  	open_index = [userarea*512 + 496 + 2*file_des +1];
+ 	alias inode_entry R12;
+  	inode_entry = [OPEN_FILE_TABLE + 4*open_index];
+
+   	backup;
+ 	R1=ACQUIRE_INODE;
+ 	R2=[SYSTEM_STATUS_TABLE +1];
+ 	R3=inode_entry;
+  	call MOD_0;
+
+   	if(R0==-1) then
+
+   	backup;
+  	R1=RELEASE_INODE;
+ 	R2=[SYSTEM_STATUS_TABLE +1];
+  	R3=inode_entry;
+    	call MOD_0;
+    	restore;
+
+   	[ret_val]=-1;
+   	[process+ 9]=0;
+  	SP=userSP;
+  	ireturn;
+  	endif;
+  	restore;
+
+  	alias lseek R13;
+ 	lseek = [OPEN_FILE_TABLE + 4*open_index + 2];
+
+  	alias offset R14;
+     	offset =[[PTBR + ((userSP-3)/512)*2]*512 + (userSP-3)%512];
+
+   	if(lseek + offset < 0) then
+   	backup;
+  	R1=RELEASE_INODE;
+  	R2=[SYSTEM_STATUS_TABLE +1];
+  	R3=inode_entry;
+    	call MOD_0;
+   	restore;
+
+ 	[ret_val]=-2;
+  	SP=userSP;
+ 	[process +9]=0;
+  	ireturn;
+ 	endif;
+
+ 	if(offset ==0) then
+  	[OPEN_FILE_TABLE + 4*open_index +2]=0;
+
+  	else
+   	if((lseek + offset) > [INODE_TABLE + 16*inode_entry +2]) then
+   	[OPEN_FILE_TABLE + 4*open_index +2]=[INODE_TABLE + 16*inode_entry +2];
+    
+  	else
+  	[OPEN_FILE_TABLE + 4*open_index +2]=lseek + offset;
+  	endif;
+ 	endif;
+
+	backup;
+ 	R1=RELEASE_INODE;
+ 	R2=[SYSTEM_STATUS_TABLE +1];
+ 	R3=inode_entry;
+ 	call MOD_0;
+   	restore;
+
+  	[ret_val]=0;
+  	SP=userSP;
+  	[process +9]=0;
+  	ireturn;
+
+endif;

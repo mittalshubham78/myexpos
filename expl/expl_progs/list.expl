@@ -1,0 +1,56 @@
+type
+node 
+{
+  int data;
+  node next;
+}
+endtype
+
+decl 
+node root;
+enddecl
+
+int main()
+{
+   decl
+   int n,i,ele,x;
+   node rest;
+   node temp;
+   enddecl
+ 
+   begin
+  
+  x=initialize();
+   i=0;
+  root=null;
+   read(n); 
+
+  while(i < n) do
+   read(ele);
+
+   if(root==null) then
+   rest=alloc();
+  rest.data=ele;
+  rest.next=null;
+    temp=rest;
+  root=temp;
+
+   else
+  rest=alloc();
+  rest.data=ele; 
+  rest.next=null; 
+     temp.next=rest;
+     temp=temp.next;
+ endif;
+ i=i+1;
+ endwhile;
+
+ temp=root;
+ while(temp!=null) do
+  write(temp.data);
+  temp=temp.next;
+   endwhile;
+
+return 0;
+ end
+}

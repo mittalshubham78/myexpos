@@ -1,0 +1,212 @@
+alias sys_call R1;
+alias userSP R0;
+alias process R12;
+
+alias ret R15;
+ userSP=SP;
+
+breakpoint;
+
+process=PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16);
+
+[process +13]=SP;
+
+SP=[process + 11]*512 -1;
+
+sys_call = [[PTBR + ((userSP-5)/512)*2]*512 + (userSP-5)%512];
+
+ret=[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512;
+
+if(sys_call ==1) then
+
+   
+ alias inode R13;
+alias root R14;
+  	[process +9]=1;
+
+	alias file R6;
+
+	file=[[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+
+	alias permission R8;
+	permission=[[PTBR + ((userSP-3)/512)*2]*512 + (userSP- 3)%512];
+
+
+	alias i R7;
+	i=0;
+
+	while(i < MAX_FILE_NUM) do
+	inode=INODE_TABLE + (i*16); 
+	if([inode + 1]==file) then
+	[process +9]=0;
+	[ret]=0;
+	SP=[process + 13];
+	ireturn;
+	endif;
+	i=i+1;
+	endwhile;
+
+	i=0;
+	alias present R9;
+	present =-1;
+
+	while(i < MAX_FILE_NUM) do
+	inode=INODE_TABLE + (i*16);
+	if([inode +1]==-1) then
+	present=i;
+	break;
+	endif;
+	i=i+1;
+	endwhile;
+
+	if(present==-1) then
+	[process +9]=0;
+	[ret]=-1;
+	SP=[process + 13];
+	ireturn;
+	endif;
+    
+        
+        
+	inode=INODE_TABLE + (present*16);
+       
+	[inode]=DATA;
+	[inode +1]=file;
+	[inode +2]=0;
+	[inode+8]=-1;
+	[inode+9]=-1;
+	[inode+10]=-1;
+	[inode+11]=-1;
+
+	[inode+3]=[process +3]; //userID same as process's userID
+	[inode+4]=permission;
+
+	root=ROOT_FILE + (present*8);
+
+	[root]=file;
+	[root +1]=0;
+	[root +2]=DATA;
+	[root +3]=[USER_TABLE +(2*[process +3])];
+	[root +4]=permission;
+
+	[process +9]=0;
+	[ret]=0;
+	SP=[process + 13];
+
+	breakpoint;
+	ireturn;
+	endif;
+
+
+if(sys_call == 4) then
+
+	alias inode R13;
+	alias root R14;
+
+	[process +9]=4;
+
+	alias file R6;
+
+	file=[[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+
+
+	alias i R7;
+	i=0;
+	alias present R8;
+ 
+	present=-1;
+
+	while(i < MAX_FILE_NUM) do
+	if([INODE_TABLE + (i*16) + 1]==file) then
+	present=i;
+	break;
+	endif;
+	i=i+1;
+	endwhile;
+
+	if(present==-1) then
+	[ret]=0;
+	[process +9]=0;
+	SP=[process + 13];
+	ireturn;
+	endif;
+
+	inode=INODE_TABLE + (present*16);
+
+	if([inode]!=DATA) then
+	[ret]=-1;
+	[process +9]=0;
+	SP=[process + 13];
+	ireturn;
+	endif;
+
+
+	if([inode + 4]==0) then
+	if( ([inode + 3]!=[process + 3]) && ([process +3]!=1)) then
+
+	[ret]=-1;
+	[process +9]=0;
+	SP=[process + 13];
+	ireturn;
+	endif;
+	endif;
+
+	backup;
+	R1=ACQUIRE_INODE;
+	R2=[SYSTEM_STATUS_TABLE +1];
+	R3=present;
+	call MOD_0;
+	restore;
+	
+	if([FILE_STATUS_TABLE + (present*4) + 1]!=-1) then
+	backup;
+ 	R1=RELEASE_INODE;
+   	R2=[SYSTEM_STATUS_TABLE +1];
+    	R3=present;
+   	call MOD_0;
+  	restore;
+   	[ret]=-2;
+   	[process +9]=0;
+   	SP=[process + 13];
+    	ireturn;
+  	endif;
+
+
+ 	i=8;
+ 	alias buffer R10;
+
+  	inode=INODE_TABLE + (present*16);
+
+  	while(i < 12) do
+ 	if([inode +i]!=-1) then
+ 	buffer=BUFFER_TABLE + (4*(i % 4));
+
+	if(([buffer] == [inode + i]) && ([buffer +1]==1)) then
+    	[buffer +1]=0;
+   	endif;
+    	backup;
+   	R1=RELEASE_BLOCK;
+   	R2=[inode + i];
+     	call MOD_2;
+     	restore;
+  	endif;
+   	i=i+1;
+  	endwhile;
+
+	[inode  +1]=-1;
+	[ROOT_FILE + (present*8)]=-1;
+
+  	backup;
+  	R1=RELEASE_INODE;
+ 	R2=[SYSTEM_STATUS_TABLE +1]; 
+  	R3=present;
+ 	call MOD_0;
+  	restore;
+
+	[ret]=0;
+   	[process +9]=0;
+ 	SP=[process + 13];
+  	ireturn;
+	endif;
+	SP=[process +13];
+ ireturn;
