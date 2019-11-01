@@ -14,9 +14,10 @@ word = [[PTBR + ((userSP-3)/512)*2]*512 + (userSP-3)%512];
 alias userarea R6;
 userarea = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +11];
 
+
 if(filedes != -2) then
  
-	if(filedes < 0 || filedes > 7 || [userarea * 512 +496 + 2*filedes]!=FILE) then
+if(filedes < 0 || filedes > 7 || [userarea * 512 +496 + 2*filedes]!=FILE) then
  	[[PTBR + 2*((userSP-1)/512)]*512 + (userSP-1)%512]=-1;
   	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
   	SP=userSP;
@@ -30,7 +31,7 @@ if(filedes != -2) then
  	alias inode R9;
 	inode = [OPEN_FILE_TABLE + open_entry*4];
 
- if(([PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +3]==[INODE_TABLE + inode*16  +3]) && ([PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +3]!=1) && ([INODE_TABLE + inode*16 +3] ==EXCLUSIVE)) then
+ if(([PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +3]!=[INODE_TABLE + inode*16  +3]) && ([PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +3]!=1) && ([INODE_TABLE + inode*16 + 4] ==EXCLUSIVE)) then
 
   	[[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]=-3;
   	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
@@ -54,6 +55,7 @@ if(filedes != -2) then
    	SP=userSP;
    	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
    	[[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]=-1;
+	restore;
    	ireturn;
   	endif;
  	restore;
@@ -83,6 +85,7 @@ if(filedes != -2) then
     	block_num = R0;
    	multipop(R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10);
 
+        
       	if(block_num ==-1) then
     	backup;
    	R1=RELEASE_INODE;

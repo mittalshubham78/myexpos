@@ -1,0 +1,18 @@
+int main()
+{
+    decl
+     int temp,ret,a,b;
+    int filedes1,filedes2;
+   str file;
+    enddecl
+
+     begin
+    
+
+   temp=exposcall("Read",-1,file);
+
+     temp=exposcall("Delete",file);
+
+    return 0;
+   end
+}  

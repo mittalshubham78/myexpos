@@ -14,20 +14,19 @@ int main()
     
         iter=1;
 
-         while(iter <=100) do
+         while(iter <= 500) do
         a=exposcall("Write",filedes,iter);
            
            iter=iter+1;
          endwhile;
 
-       
+                  
 
         iter=exposcall("Seek",filedes,2048);
         iter=exposcall("Seek",filedes,-1);
 
 
        
-
      while(1==1) do
       temp=exposcall("Read",filedes,word);
     

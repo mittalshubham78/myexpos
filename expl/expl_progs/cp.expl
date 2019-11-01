@@ -1,0 +1,33 @@
+int main()
+{
+   decl
+   int temp,ret,a,b,filedes1,filedes2;
+   str file1,file2,word;
+    enddecl
+
+    begin
+  
+    temp=exposcall("Read",-1,file1);
+   temp=exposcall("Read",-1,file2);
+ 
+    temp=exposcall("Create",file2,1);
+     filedes2=exposcall("Open",file2);    
+
+    filedes1=exposcall("Open",file1);
+
+      while(1==1) do
+       temp=exposcall("Read",filedes1,word);
+
+         if(temp == -2) then
+         break;
+
+          else
+        temp=exposcall("Write",filedes2,word);
+       endif;
+      endwhile;
+ 
+    temp=exposcall("Close",file1);
+    temp=exposcall("Close",file2);
+   return 0;
+   end
+}

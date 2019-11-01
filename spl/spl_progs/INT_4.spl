@@ -20,8 +20,9 @@ ret=[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512;
 if(sys_call ==1) then
 
    
- alias inode R13;
+alias inode R13;
 alias root R14;
+
   	[process +9]=1;
 
 	alias file R6;
@@ -78,7 +79,7 @@ alias root R14;
 	[inode+10]=-1;
 	[inode+11]=-1;
 
-	[inode+3]=[process +3]; //userID same as process's userID
+	[inode+3]=[process +3];            //userID same as process's userID
 	[inode+4]=permission;
 
 	root=ROOT_FILE + (present*8);
@@ -186,14 +187,18 @@ if(sys_call == 4) then
    	endif;
     	backup;
    	R1=RELEASE_BLOCK;
-   	R2=[inode + i];
+   	R2=[inode + i];               
      	call MOD_2;
      	restore;
   	endif;
    	i=i+1;
   	endwhile;
 
-	[inode  +1]=-1;
+
+      inode=INODE_TABLE + (present*16);
+
+         [inode]=DATA;
+	[inode +1]=-1;
 	[ROOT_FILE + (present*8)]=-1;
 
   	backup;
@@ -208,5 +213,4 @@ if(sys_call == 4) then
  	SP=[process + 13];
   	ireturn;
 	endif;
-	SP=[process +13];
  ireturn;

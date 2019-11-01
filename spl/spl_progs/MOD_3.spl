@@ -68,11 +68,13 @@ if(function == 3) then
        	[FILE_STATUS_TABLE + inode_entry * 4 +1]=1;
      
      	else
- [FILE_STATUS_TABLE + inode_entry * 4 +1]=[FILE_STATUS_TABLE + inode_entry * 4 + 1] +1;
+        [FILE_STATUS_TABLE + inode_entry * 4 +1]=[FILE_STATUS_TABLE + inode_entry * 4 + 1] +1;
     	endif;
 
     	[OPEN_FILE_TABLE + open_entry * 4]=inode_entry;
   	endif;
+
+         print([FILE_STATUS_TABLE + inode_entry*4 +1]);
 
   	[OPEN_FILE_TABLE + open_entry * 4 + 1]=1;
    	[OPEN_FILE_TABLE + open_entry * 4 + 2]=0;
@@ -94,13 +96,13 @@ if(function == 4) then
   	alias inode_entry R7;
   	inode_entry = [OPEN_FILE_TABLE + file_index * 4];
  
- 	[OPEN_FILE_TABLE + file_index * 4 +1]=[OPEN_FILE_TABLE + file_index * 4         +1]-1;  
+ 	[OPEN_FILE_TABLE + file_index * 4 +1]=[OPEN_FILE_TABLE + file_index * 4 +1]-1;  
+
    	if([OPEN_FILE_TABLE + file_index * 4 +1]==0) then
       	[OPEN_FILE_TABLE + file_index * 4]=-1;
-      	[OPEN_FILE_TABLE + file_index *4 +1]=-1;
   
      	if([INODE_TABLE + inode_entry*16 + 1]!="root") then
-	[FILE_STATUS_TABLE + inode_entry*4 +1]=[FILE_STATUS_TABLE + inode_entry*	4 +1]-1;
+	[FILE_STATUS_TABLE + inode_entry*4 +1]=[FILE_STATUS_TABLE + inode_entry*4 +1]-1;
      
       	if([FILE_STATUS_TABLE + inode_entry*4 +1]==0) then
         [FILE_STATUS_TABLE + inode_entry*4 +1]=-1;
@@ -129,6 +131,7 @@ if(function ==2) then
 
    	breakpoint;
 
+         
     	if([BUFFER_TABLE + 4*buffer] != disk_block) then
         if([BUFFER_TABLE + 4*buffer + 1]==1) then
         backup;
@@ -144,18 +147,18 @@ if(function ==2) then
 
    	breakpoint;
        	backup;
-      	R1=2;
-      	R4=disk_block;
-     	R2=[SYSTEM_STATUS_TABLE +1];
-      	R3=71+buffer;
-    	call MOD_4;
-     	restore;
+      	 R1=2;
+      	 R4=disk_block;
+     	    R2=[SYSTEM_STATUS_TABLE +1];
+      	 R3=71+buffer;
+      	 call MOD_4;
+     	  restore;
   
      	[BUFFER_TABLE + 4*buffer]=disk_block;
     	endif;
 
      	[memory_add]=[(71 + buffer)*512 + offset];
-
+          
    	backup;
     	R1=2;
     	R2=[SYSTEM_STATUS_TABLE +1];
@@ -185,10 +188,10 @@ if(function ==1) then
      	if([BUFFER_TABLE + buffer*4 + 1]==1) then
      	backup;
     	R1=DISK_STORE;
-  	R2=[SYSTEM_STATUS_TABLE +1];
-  	R3=71+buffer;
- 	R4=[BUFFER_TABLE + buffer*4];
-   	call MOD_4;
+  	  R2=[SYSTEM_STATUS_TABLE +1];
+  	  R3=71+buffer;
+ 	    R4=[BUFFER_TABLE + buffer*4];
+   	  call MOD_4;
   	restore;
 
      	[BUFFER_TABLE + 4*buffer +1]=0;
@@ -196,9 +199,10 @@ if(function ==1) then
 
   	backup;
   	R1=DISK_LOAD;
+    R4=block_num;
   	R2=[SYSTEM_STATUS_TABLE +1];
- 	R3=71+buffer;
- 	R4=block_num;
+ 	  R3=71+buffer;
+ 	
   	call MOD_4;
   	restore;
 
@@ -206,6 +210,8 @@ if(function ==1) then
    	endif;
 
    	[(71 + buffer)*512 +offset]=word;
+
+          
   	[BUFFER_TABLE + 4*buffer + 1]=1;
 
   	backup;

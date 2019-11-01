@@ -7,73 +7,73 @@ SP=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +11]*512 -1;
 
 if(sys_call == 11) then
 
-[PROCESS_TABLE +([SYSTEM_STATUS_TABLE +1]*16) +9]=sys_call;
+	[PROCESS_TABLE +([SYSTEM_STATUS_TABLE +1]*16) +9]=sys_call;
 
-[[PTBR +((userSP-1)/512)*2]*512 + (userSP-1)%512]=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +1];
- [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+	[[PTBR +((userSP-1)/512)*2]*512 + (userSP-1)%512]=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +1];
+	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
 
-SP=userSP;
- ireturn;
-endif;
+	SP=userSP;
+	ireturn;
+	endif;
 
 if(sys_call ==12) then
 
-[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=sys_call;
+	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=sys_call;
 
-[[PTBR +((userSP-1)/512)*2]*512 + (userSP-1)%512]=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +2];
+	[[PTBR +((userSP-1)/512)*2]*512 + (userSP-1)%512]=[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +2];
 
-[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
-SP=userSP;
+	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+	SP=userSP;
 
-ireturn;
-endif;
+	ireturn;
+	endif;
 
 
 if(sys_call==13) then
 
-[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=sys_call;
+	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=sys_call;
 
-alias argpid R6;
-argpid=[[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+	alias argpid R6;
+	argpid=[[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
 
-if((argpid<0)||(argpid>=16)||(argpid==[SYSTEM_STATUS_TABLE +1])||([PROCESS_TABLE+(argpid*16) +4]==TERMINATED)) then
-  [[PTBR + ((userSP-1)/512)*2] + (userSP-1)%512]=-1;
-  [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
-   SP=userSP;
-   ireturn;
-  endif;
+	if((argpid<0)||(argpid>=16)||(argpid==[SYSTEM_STATUS_TABLE +1])||([PROCESS_TABLE+(argpid*16) +4]==TERMINATED)) then
+ 	[[PTBR + ((userSP-1)/512)*2] + (userSP-1)%512]=-1;
+  	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+   	SP=userSP;
+   	ireturn;
+  	endif;
 
- [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +4]=WAIT_PROCESS;
-  [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +5]=argpid;
+ 	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +4]=WAIT_PROCESS;
+  	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +5]=argpid;
   
-  backup;
- call MOD_5;
-  restore;
+  	backup;
+ 	call MOD_5;
+  	restore;
 
-[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
-  [[PTBR + ((userSP-1)/512)*2] + (userSP-1)%512]=0;
-  SP=userSP;
-  ireturn;
+	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+  	[[PTBR + ((userSP-1)/512)*2] + (userSP-1)%512]=0;
+  	SP=userSP;
+  	ireturn;
  
-endif;
+	endif;
 
 if(sys_call==14) then
 
-[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=sys_call;
+	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=sys_call;
 
-alias i R6;
-i=0;
- while(i < 16) do
-if(([PROCESS_TABLE + (i*16) +4]==WAIT_PROCESS) && ([PROCESS_TABLE + (i*16) +5]==[SYSTEM_STATUS_TABLE +1])) then
-  [PROCESS_TABLE + (i*16) +4]=READY;
-  endif;
- i=i+1;
- endwhile;
+	alias i R6;
+	i=0;
+	while(i < 16) do
+	if(([PROCESS_TABLE + (i*16) +4]==WAIT_PROCESS) && ([PROCESS_TABLE + (i*16) +5]==[SYSTEM_STATUS_TABLE +1])) then
+  	[PROCESS_TABLE + (i*16) +4]=READY;
+  	endif;
+ 	i=i+1;
+	endwhile;
 
-[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
  
- [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]=0;
-  SP=userSP;
- ireturn;
+ 	[[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]=0;
+  	SP=userSP;
+ 	ireturn;
 endif;
 

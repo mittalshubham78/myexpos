@@ -17,9 +17,9 @@ alias userarea R7;
 userarea = [process +11];
 
 
-if(sys_call == 2) then
+if(sys_call == INT_OPEN) then
 
-	[process +9]=2;
+	[process +9]=INT_OPEN;
   
  	alias file_name R6;
     	file_name = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
@@ -38,7 +38,7 @@ if(sys_call == 2) then
   	endwhile;
 
 
-if(file_des == -1) then
+        if(file_des == -1) then
 	[process +9]=0;
   	SP=userSP;
 	[ret_val]=-3;
@@ -54,14 +54,14 @@ if(file_des == -1) then
   	alias file_index R9;
    	file_index = R0;
 
-if(file_index == -1) then
+         if(file_index == -1) then
    	 [ret_val]=-1;
    	 SP=userSP;
   	 [process + 9]=0;
  	 ireturn;
 	 endif;
 
-if(file_index == -2) then
+         if(file_index == -2) then
    	 [ret_val]=-2;
   	 SP=userSP;
    	 [process + 9]=0;
@@ -77,15 +77,15 @@ if(file_index == -2) then
 
   	 [ret_val]=file_des;
  	 ireturn;
-	 endif;
+endif;
 
-if(sys_call == 3) then
-	[process + 9]=3;
+if(sys_call == INT_CLOSE) then
+	[process + 10]=3;
  
 	alias file_des R12;
   	file_des =[[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
 
-if((file_des < 0) || (file_des > 7)) then
+        if((file_des < 0) || (file_des > 7)) then
    	[ret_val]=-1;
   	[process + 9]=0;
     	SP=userSP;
@@ -93,7 +93,7 @@ if((file_des < 0) || (file_des > 7)) then
   	endif;
   
 
-if([userarea * 512 +496 +2*file_des]!=FILE) then
+        if([userarea * 512 +496 +2*file_des]!=FILE) then
  	[ret_val]=-1;
  	[process + 9]=0;
   	SP=userSP;
@@ -116,15 +116,15 @@ if([userarea * 512 +496 +2*file_des]!=FILE) then
   	SP=userSP;
   	[ret_val]=0;
   	ireturn;
- 	endif;
+ endif;
 
-if(sys_call ==6) then
+if(sys_call == INT_SEEK) then
  	[process +9]=6;
 
   	alias file_des R6;
   	file_des = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
 
-	if(file_des < 0 || file_des > 7 || [userarea*512 +496 + 2*file_des]!=FILE) then
+      if(file_des < 0 || file_des > 7 || [userarea*512 +496 + 2*file_des]!=FILE) then
   	[ret_val]=-1;
  	SP=userSP;
  	[process +9]=0;
@@ -160,11 +160,11 @@ if(sys_call ==6) then
 
   	alias lseek R13;
  	lseek = [OPEN_FILE_TABLE + 4*open_index + 2];
-
+    
   	alias offset R14;
      	offset =[[PTBR + ((userSP-3)/512)*2]*512 + (userSP-3)%512];
 
-   	if(lseek + offset < 0) then
+        if(lseek + offset < 0) then
    	backup;
   	R1=RELEASE_INODE;
   	R2=[SYSTEM_STATUS_TABLE +1];
@@ -178,11 +178,11 @@ if(sys_call ==6) then
   	ireturn;
  	endif;
 
- 	if(offset ==0) then
+        if(offset ==0) then
   	[OPEN_FILE_TABLE + 4*open_index +2]=0;
 
   	else
-   	if((lseek + offset) > [INODE_TABLE + 16*inode_entry +2]) then
+        if((lseek + offset) > [INODE_TABLE + 16*inode_entry +2]) then
    	[OPEN_FILE_TABLE + 4*open_index +2]=[INODE_TABLE + 16*inode_entry +2];
     
   	else

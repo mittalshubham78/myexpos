@@ -41,6 +41,11 @@ load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog1.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog2.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog3.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/cat.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog4.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/cp.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/rm.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/ls.xsm
 load --int=console $HOME/Downloads/myexpos/spl/spl_progs/coninthandler.xsm
 load --int=disk $HOME/Downloads/myexpos/spl/spl_progs/disk_inthand.xsm
 load --data $HOME/Downloads/myexpos/sample.dat

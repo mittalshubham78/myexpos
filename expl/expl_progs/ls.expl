@@ -1,0 +1,32 @@
+int main()
+{
+   decl
+    int temp,i,j,page,filedes;
+   str file;
+    enddecl
+
+   begin
+ 
+    filedes = exposcall("Open","root");
+
+        while(1==1) do
+      temp = exposcall("Read",filedes,file);
+
+           if(temp!=-2) then
+
+            if(file !="-1") then
+          temp=exposcall("Write",-2,file);
+            endif;
+         
+          else
+        break;
+          endif;
+
+        temp=exposcall("Seek",filedes,7);
+     endwhile;
+
+   temp=exposcall("Close","root");
+  
+  return 0;
+  end
+}

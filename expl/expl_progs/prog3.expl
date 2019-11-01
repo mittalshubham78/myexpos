@@ -33,7 +33,7 @@ int main()
              break;
           endif;
 
-        temp=exposcall("Write",-2,word);
+         temp=exposcall("Write",-2,word);
         temp=exposcall("Seek",filedes,-2);
           
           
