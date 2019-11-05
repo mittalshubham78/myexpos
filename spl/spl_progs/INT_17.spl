@@ -1,0 +1,64 @@
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=27;
+
+alias userSP R0; 
+userSP = SP;
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +13]=SP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +11]*512 -1;
+
+alias username R4;
+alias password R5;
+
+username = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+password = [[PTBR + ((userSP-3)/512)*2]*512 + (userSP-3)%512];
+
+if([PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 1]!=1) then
+  	[PROCESS_TABLE +  ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+  	[[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]=-2;
+ 	SP=userSP;
+   	ireturn;
+  	endif;
+
+	alias i R6;
+  	i=0;
+	alias userid R7;
+  	userid = -1;
+
+	while(i < MAX_USER_NUM) do
+  	if([USER_TABLE + i*2]==username) then
+    	userid = i;
+  	break;
+  	endif;
+  	i=i+1;
+ 	endwhile;
+
+	if(userid == -1) then
+ 	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+  	[[PTBR + ((userSP-1)/512)*2]*512 + (userSP -1)%512]=-1;
+  	SP=userSP;
+  	ireturn;
+ 	endif;
+
+	encrypt password;
+
+ 	if(password != [USER_TABLE + 2*userid +1]) then
+  	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+   	[[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)% 512]=-1;
+  	SP=userSP;
+  	ireturn;
+  	endif;
+
+ 	[PROCESS_TABLE + 32 + 4]=CREATED;
+	[PROCESS_TABLE + 32 + 3]=userid;
+
+  	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +4]=WAIT_PROCESS;
+  	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +5]=2;
+
+	[SYSTEM_STATUS_TABLE] = userid;
+
+   	backup;
+  	call MOD_5;
+  	restore;
+
+  	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=0;
+   	SP=userSP;
+ ireturn;

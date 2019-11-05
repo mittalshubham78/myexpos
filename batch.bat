@@ -20,8 +20,12 @@ load --int=9 $HOME/Downloads/myexpos/spl/spl_progs/INT_9.xsm
 load --int=8 $HOME/Downloads/myexpos/spl/spl_progs/fork.xsm
 load --int=4 $HOME/Downloads/myexpos/spl/spl_progs/INT_4.xsm
 load --int=5 $HOME/Downloads/myexpos/spl/spl_progs/INT_5.xsm
+load --int=17 $HOME/Downloads/myexpos/spl/spl_progs/INT_17.xsm
+load --int=12 $HOME/Downloads/myexpos/spl/spl_progs/INT_12.xsm
+load --int=16 $HOME/Downloads/myexpos/spl/spl_progs/INT_16.xsm
 load --module 3 $HOME/Downloads/myexpos/spl/spl_progs/MOD_3.xsm
-load --init $HOME/Downloads/myexpos/expl/expl_progs/other5.xsm
+load --init $HOME/Downloads/myexpos/expl/expl_progs/login.xsm
+load --shell $HOME/Downloads/myexpos/expl/expl_progs/builtin_shell.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/sort.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/list.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/pev.xsm
@@ -46,6 +50,9 @@ load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog4.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/cp.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/rm.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/ls.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/other5.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/lu.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/ru.xsm
 load --int=console $HOME/Downloads/myexpos/spl/spl_progs/coninthandler.xsm
 load --int=disk $HOME/Downloads/myexpos/spl/spl_progs/disk_inthand.xsm
 load --data $HOME/Downloads/myexpos/sample.dat

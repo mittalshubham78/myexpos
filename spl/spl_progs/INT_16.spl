@@ -1,0 +1,242 @@
+alias userSP R0;
+userSP = SP;
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +13]=SP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +11]*512 -1;
+
+
+alias sys_call R5;
+sys_call = [[PTBR + ((userSP-5)/512)*2]*512 + (userSP-5)%512];
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=sys_call;
+
+alias ret R8;
+
+ret = [PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512;
+
+alias process R9;
+process = PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16);
+
+alias username R3;
+alias password R4;
+
+username = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+password = [[PTBR + ((userSP-3)/512)*2]*512 + (userSP-3)%512];
+
+if(sys_call == 22) then
+
+	encrypt password;
+    
+	if(([process + 3]!=1) || ([SYSTEM_STATUS_TABLE +1]!=2)) then
+  	[ret]=-2;
+  	[process +9]=0;
+  	SP = userSP;
+  	ireturn;
+  	endif;
+
+	alias i R6;
+ 	i = 0;
+
+  	while(i < MAX_USER_NUM) do
+    	if([USER_TABLE + (2*i)] == username) then
+   	[ret]=-1;
+    	[process +9]=0;
+   	SP = userSP;
+  	ireturn;
+   	endif;
+ 	i=i+1;
+  	endwhile;
+
+	alias free_entry R7;
+  	free_entry = -1;
+
+ 	i = 0;
+ 	while(i < MAX_USER_NUM) do
+     	if([USER_TABLE + 2*i]==-1) then
+     	free_entry = i;
+   	break;
+   	endif;
+  	i=i+1;
+ 	endwhile;
+
+ 	if(free_entry == -1) then
+  	[ret]=-3;
+   	[process +9]=0;
+    	SP =userSP;
+  	ireturn;
+  	endif;
+
+	[USER_TABLE + 2*free_entry] = username;
+	[USER_TABLE + 2*free_entry + 1]=password;
+
+	[process +9]=0;
+	[ret]=0;
+         SP=userSP;
+	ireturn;
+	endif;
+
+if(sys_call == 23) then
+
+
+	if(([process +3]!=1) || ([SYSTEM_STATUS_TABLE +1]!=2)) then
+ 
+ 	[ret]=-2;
+	[process +9]=0;
+      	SP=userSP;
+        ireturn;
+ 	endif;
+
+   	if(username=="root"||username=="kernel") then
+     	[ret]=-2;
+        [process +9]=0;
+        SP = userSP;
+       	ireturn;
+	endif;
+
+	alias user_entry R7;
+	user_entry =-1;
+
+	alias i R6;
+ 	i=0;
+	
+	while(i < MAX_USER_NUM) do
+ 	if([USER_TABLE + 2*i]==username) then
+ 	user_entry = i;
+ 	break;
+	endif;
+	i =i+1;
+	endwhile;
+
+	if(user_entry == -1) then
+	[ret]=-1;
+	[process +9]=0;
+	SP = userSP;
+ 	ireturn;
+	endif;
+
+	i=0;
+       	alias temp R10;
+
+	while(i < MAX_FILE_NUM) do
+            temp = ROOT_FILE + 8*i;
+	if(([temp]!=-1) && ([temp + 3]==username)) then
+        [process]=-3;
+	[process +9]=0;
+	SP = userSP;
+	ireturn;
+	endif;
+        i=i+1;
+	endwhile;
+
+	[USER_TABLE + user_entry*2]=-1;
+	[USER_TABLE + user_entry*2 + 1]=-1;
+
+	[process +9]=0;
+	[ret]=0;
+ 	SP=userSP;
+ 	ireturn;
+	endif;
+
+if(sys_call == 24) then
+
+    
+  	if([process + 1]!=2) then
+  	[ret]=-1;
+	[process +9]=0;
+	SP=userSP;
+	ireturn;
+	endif;
+
+	alias i R6;
+	i=0;
+
+      	alias user_entry R7;
+ 	user_entry=-1;
+
+        alias temp R10;
+
+	while(i < MAX_USER_NUM) do
+          temp = USER_TABLE + 2*i;
+ 	if([temp]==username) then
+      	user_entry = i;
+	break;
+	endif;
+	i=i+1;
+	endwhile;
+
+	if(user_entry == -1) then
+	[ret]=-2;
+	[process +9]=0;
+	SP=userSP;
+	ireturn;
+	endif;
+
+
+	if([process +3]!=user_entry) then
+	if([process +3]!=1) then
+	[ret]=-1;
+	[process +9]=0;
+	SP=userSP;
+	ireturn;
+	endif;
+	endif;
+
+	encrypt password;
+	[USER_TABLE + user_entry*2 +1]=password;
+	[process +9]=0;
+        SP=userSP;
+	[ret]=0;
+	ireturn;
+endif;
+
+if(sys_call == 25) then
+
+ 	alias userid R11;
+
+  	userid = username;
+
+ 	if(userid < 0 || userid > 15 || [USER_TABLE + 2*userid]==-1) then
+   	[ret]=-1;
+   	[process +9]=0;
+    	SP = userSP;
+	ireturn;
+	endif;
+
+
+
+	[process +9]=0;
+          [ret] = [USER_TABLE + 2*userid];
+     	SP=userSP;
+    	ireturn;
+ endif;
+
+if(sys_call == 26) then
+
+	
+	alias i R4;
+	i=0;
+
+	alias user_id R6;
+	user_id =-1;
+
+	while(i < MAX_USER_NUM) do
+ 	if([USER_TABLE + 2*i]==username) then
+	user_id = i;
+	break;
+	endif;
+	i=i+1;
+	endwhile;
+
+	if(user_id ==-1) then	
+     	[ret]=-1;
+
+        else
+        [ret]=user_id;
+ 	endif;
+
+	[process +9]=0;
+	SP =userSP;
+	ireturn;
+endif;
+
+	

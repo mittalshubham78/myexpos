@@ -1,0 +1,35 @@
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +9]=28;
+
+alias userSP R0;
+
+userSP = SP;
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +13]=SP;
+
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +11]*512 -1;
+
+if([SYSTEM_STATUS_TABLE +1]!=2) then
+	[[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]=-1;
+   	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) + 9]=0;
+   	SP = userSP;
+  	ireturn;
+  	endif;
+
+	backup;
+ 	R1=KILL_ALL;
+ 	R2=2;
+	call MOD_1;
+ 	restore;
+
+	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16) +4]=TERMINATED;
+
+	[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1]*16) +13] = 8*512;
+
+     [[PAGE_TABLE_BASE + 2*20 +16]*512] = [[PAGE_TABLE_BASE + 2*20 + 8]*512 +1];
+
+	[PROCESS_TABLE + 16 + 4]=READY;
+	[SYSTEM_STATUS_TABLE] = 0;
+
+
+call MOD_5;
+ 
