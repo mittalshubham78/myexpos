@@ -7,20 +7,26 @@ int main()
    enddecl
 
     begin
+   	temp = exposcall("Read",-1,username);
 
      filedes = exposcall("Open","root");
-
+          
       i=0;
-
+    offset = 0;
     while(i < 60) do
-    offset = 8*i;
-     temp = exposcall("Seek",filedes,offset);
-     temp = exposcall("Read",filedes,filename); 
-     temp=exposcall("Write",-2,filename);
-    offset= 8*i +3;
-   temp = exposcall("Seek",filedes,offset);
-     temp = exposcall("Read",filedes,username);
-    temp=exposcall("Write",-2,username);
+     temp = exposcall("Read",filedes,filename);
+	write(filename);
+    offset= 2;
+   temp = exposcall("Seek",filedes,offset);	
+     temp = exposcall("Read",filedes,word);
+    write(word);
+      if(word  == username) then
+    temp = exposcall("Delete",filename);
+        endif;
+	temp = exposcall("Seek",filedes,4);
+	if(temp != 0) then
+		break;
+	endif;
      i=i+1;
     endwhile;
 

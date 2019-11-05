@@ -1,0 +1,19 @@
+int main()
+{
+   decl
+   int temp;
+   str file;
+   enddecl
+
+   begin
+   
+   temp=exposcall("Fork");
+   temp=exposcall("Fork");
+   temp=exposcall("Fork");
+   temp=exposcall("Fork");
+
+   temp = exposcall("Exec","prog1.xsm");
+ 
+   return 0;
+  end
+}

@@ -53,6 +53,7 @@ load --exec $HOME/Downloads/myexpos/expl/expl_progs/ls.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/other5.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/lu.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/ru.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/new.xsm
 load --int=console $HOME/Downloads/myexpos/spl/spl_progs/coninthandler.xsm
 load --int=disk $HOME/Downloads/myexpos/spl/spl_progs/disk_inthand.xsm
 load --data $HOME/Downloads/myexpos/sample.dat

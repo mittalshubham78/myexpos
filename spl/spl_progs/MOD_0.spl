@@ -111,6 +111,7 @@ if(functionnum ==4) then
 	R0=-1;
 	return;
 	endif;
+
 	[FILE_STATUS_TABLE +(4*index)]=currentPID; 
 	R0=0;
 	return;
