@@ -5,8 +5,6 @@ alias process R12;
 alias ret R15;
  userSP=SP;
 
-breakpoint;
-
 process=PROCESS_TABLE + ([SYSTEM_STATUS_TABLE +1]*16);
 
 [process +13]=SP;
@@ -93,8 +91,6 @@ alias root R14;
 	[process +9]=0;
 	[ret]=0;
 	SP=[process + 13];
-
-	breakpoint;
 	ireturn;
 	endif;
 

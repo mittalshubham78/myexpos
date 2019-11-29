@@ -10,9 +10,14 @@ int main()
 
       while(1==1) do
 
+         breakpoint;
+
     temp=exposcall("Read",-1,username);
     temp=exposcall("Read",-1,password);
 
+
+          
+       breakpoint;
      ret = exposcall("Login",username,password);
 
       if(ret == -1) then

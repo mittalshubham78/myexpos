@@ -114,14 +114,12 @@ if(function == 4) then
   	endif;        
 
 if(function ==2) then
-	breakpoint;
     	alias disk_block R2;
    	alias offset R3;
 	alias memory_add R4;
    	alias buffer R5;
     	buffer = disk_block % 4;
-    
-   	breakpoint;
+   
     	backup;
     	R1=1;
    	R2=[SYSTEM_STATUS_TABLE +1];
@@ -129,7 +127,6 @@ if(function ==2) then
   	call MOD_0;
     	restore;
 
-   	breakpoint;
 
          
     	if([BUFFER_TABLE + 4*buffer] != disk_block) then
@@ -145,7 +142,6 @@ if(function ==2) then
         [BUFFER_TABLE + 4*buffer +1]=0;
         endif;
 
-   	breakpoint;
        	backup;
       	 R1=2;
       	 R4=disk_block;

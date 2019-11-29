@@ -10,6 +10,7 @@ load --int=13 $HOME/Downloads/myexpos/spl/spl_progs/INT_13.xsm
 load --int=14 $HOME/Downloads/myexpos/spl/spl_progs/INT_14.xsm
 load --exhandler $HOME/Downloads/myexpos/spl/spl_progs/exhandler.xsm
 load --module 7 $HOME/Downloads/myexpos/spl/spl_progs/MOD_7.xsm
+load --module 6 $HOME/Downloads/myexpos/spl/spl_progs/MOD_6.xsm
 load --module 5 $HOME/Downloads/myexpos/spl/spl_progs/MOD_5.xsm
 load --module 0 $HOME/Downloads/myexpos/spl/spl_progs/MOD_0.xsm
 load --module 4 $HOME/Downloads/myexpos/spl/spl_progs/MOD_4.xsm
@@ -26,25 +27,11 @@ load --int=16 $HOME/Downloads/myexpos/spl/spl_progs/INT_16.xsm
 load --module 3 $HOME/Downloads/myexpos/spl/spl_progs/MOD_3.xsm
 load --init $HOME/Downloads/myexpos/expl/expl_progs/login.xsm
 load --shell $HOME/Downloads/myexpos/expl/expl_progs/builtin_shell.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/sort.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/list.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/pev.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/podd.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/init.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/GCD.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/pid.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/parent.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/writers.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/child.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/shell.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/merge.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/merge1.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/shell1.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/shell2.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog1.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog2.xsm
-load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog3.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/cat.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/prog4.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/cp.xsm
@@ -54,7 +41,15 @@ load --exec $HOME/Downloads/myexpos/expl/expl_progs/other5.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/lu.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/ru.xsm
 load --exec $HOME/Downloads/myexpos/expl/expl_progs/new.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/delay.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/ass3.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/pgm1.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/ass4.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/pgm2.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/merge.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/m_store.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/m_sort.xsm
+load --exec $HOME/Downloads/myexpos/expl/expl_progs/m_merge.xsm
 load --int=console $HOME/Downloads/myexpos/spl/spl_progs/coninthandler.xsm
 load --int=disk $HOME/Downloads/myexpos/spl/spl_progs/disk_inthand.xsm
 load --data $HOME/Downloads/myexpos/sample.dat
-load --data $HOME/Downloads/myexpos/numbers.dat

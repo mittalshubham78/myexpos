@@ -114,31 +114,44 @@ loadi(11,24);
  loadi(67,9);
  loadi(68,10);
 
+//load pager module
+ loadi(52,65);
+ loadi(53,66);
 
+        [SYSTEM_STATUS_TABLE + 4]=0;
+	[SYSTEM_STATUS_TABLE + 5]=0;
 	[TERMINAL_STATUS_TABLE]=0;
 
 	alias i R0;
 	i=0;
+ 
+
 	while(i < 16) do
+        [PROCESS_TABLE + (i*16)]=0;
   	[PROCESS_TABLE+(i*16)+4]=TERMINATED;
+ 	[PROCESS_TABLE + (i*16) + 6]=0;
    	i=i+1;
   	endwhile;
 
 	i=0;
  
  	while(i < 128) do
-   	if(i < 81) then
+   	if(i <= 82) then
    	[MEMORY_FREE_LIST +i]=1;
 
     	else
     	[MEMORY_FREE_LIST + i]=0;
     
+        print(i);
+        print([MEMORY_FREE_LIST + i]);
   	endif;
    	i=i+1;
     	endwhile;
 
+         breakpoint;
 
-	[SYSTEM_STATUS_TABLE +2]=47;
+
+	[SYSTEM_STATUS_TABLE +2]=45;
 	[SYSTEM_STATUS_TABLE +3]=0;
 	[DISK_STATUS_TABLE]=0;
 
@@ -229,24 +242,29 @@ loadi(11,24);
 	[PTBR+19]="0110";
 
 	PTBR=PTBR-40;
-	[PROCESS_TABLE +16+1]=1;
-	[PROCESS_TABLE +16 +3]=0;
-	[PROCESS_TABLE +16+4]=CREATED;
-	[PROCESS_TABLE +16+11]=77;
-	[PROCESS_TABLE +16+13]=8*512;
-	[PROCESS_TABLE +16+12]=0;
-	[PROCESS_TABLE +16+14]=PAGE_TABLE_BASE +20;
-	[PROCESS_TABLE +16+15]=10;
+
+        alias process R5;
+        process = PROCESS_TABLE + 16;
+	[process+1]=1;
+	[process+3]=0;
+	[process+4]=CREATED;
+	[process+11]=77;
+	[process+13]=8*512;
+	[process+12]=0;
+	[process+14]=PAGE_TABLE_BASE +20;
+	[process+15]=10;
 	[66*512]=[65*512+1];
 
-	[PROCESS_TABLE +32+1]=2;
-        [PROCESS_TABLE +32+2]=1;
-	[PROCESS_TABLE +32+4]=TERMINATED;
-	[PROCESS_TABLE +32+11]=80;
-	[PROCESS_TABLE +32+13]=8*512;
-	[PROCESS_TABLE +32+12]=0;
-	[PROCESS_TABLE +32+14]=PAGE_TABLE_BASE+40;
-	[PROCESS_TABLE +32+15]=10;
+        process = PROCESS_TABLE + 32;
+
+	[process+1]=2;
+        [process+2]=1;
+	[process+4]=TERMINATED;
+	[process+11]=80;
+	[process+13]=8*512;
+	[process+12]=0;
+	[process+14]=PAGE_TABLE_BASE+40;
+	[process+15]=10;
 	[78*512]=[67*512+1];
 
 	i=496;
